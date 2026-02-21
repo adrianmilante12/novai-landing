@@ -11,7 +11,7 @@ export default function Home() {
         const answer = button.nextElementSibling;
         answer.style.maxHeight = answer.style.maxHeight ? null : answer.scrollHeight + "px";
       });
-    })
+    });
 
     // 3D Floating Effect
     document.querySelectorAll(".floating").forEach(card => {
@@ -169,7 +169,194 @@ export default function Home() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
       });
+      
     }
+        // Carousel
+    function initCarousel(wrapperSelector, dotsSelector) {
+      const wrapper = document.querySelector(wrapperSelector);
+      if (!wrapper) return;
+      
+      const track = wrapper.querySelector(".slides");
+      const slides = Array.from(track.querySelectorAll(".slide"));
+      const dotsContainer = document.querySelector(dotsSelector);
+      const slidesWrapper = wrapper.querySelector(".slides-wrapper");
+      
+      const gap = parseInt(getComputedStyle(track).gap) || 12;
+      
+      let index = 1;
+      let isDragging = false;
+      let startX = 0;
+      let currentTranslate = 0;
+      let prevTranslate = 0;
+      let animationID;
+      let autoScroll;
+      
+      const realSlideCount = slides.length - 2;
+      
+      /* ---------------- DOTS ---------------- */
+      
+      dotsContainer.innerHTML = "";
+      for (let i = 0; i < realSlideCount; i++) {
+        const dot = document.createElement("span");
+        dot.addEventListener("click", () => moveTo(i + 1));
+        dotsContainer.appendChild(dot);
+      }
+      const dots = dotsContainer.querySelectorAll("span");
+      
+      function updateDots() {
+        dots.forEach(d => d.classList.remove("active"));
+        let realIndex = index - 1;
+        if (realIndex < 0) realIndex = realSlideCount - 1;
+        if (realIndex >= realSlideCount) realIndex = 0;
+        dots[realIndex].classList.add("active");
+        
+        slides.forEach(s => s.classList.remove("active"));
+        slides[index].classList.add("active");
+      }
+      
+      /* ---------------- POSITION ---------------- */
+      
+      function getSlideWidth() {
+        return slides[0].offsetWidth + gap;
+      }
+      
+      function setPosition(animate = true) {
+        const slideWidth = getSlideWidth();
+        const centerOffset =
+          (slidesWrapper.offsetWidth - slides[index].offsetWidth) / 2;
+        
+        const position = -index * slideWidth + centerOffset;
+        
+        track.style.transition = animate ? "transform 0.4s ease" : "none";
+        track.style.transform = `translateX(${position}px)`;
+      }
+      
+      /* ---------------- MOVE ---------------- */
+      
+      function moveTo(newIndex) {
+        index = newIndex;
+        setPosition(true);
+        updateDots();
+        resetAutoScroll();
+      }
+      
+      track.addEventListener("transitionend", () => {
+        if (index <= 0) {
+          index = realSlideCount;
+          setPosition(false);
+        }
+        if (index >= realSlideCount + 1) {
+          index = 1;
+          setPosition(false);
+        }
+      });
+      
+      /* ---------------- ARROWS ---------------- */
+      
+      wrapper.querySelector(".arrow.left")
+        .addEventListener("click", () => moveTo(index - 1));
+      
+      wrapper.querySelector(".arrow.right")
+        .addEventListener("click", () => moveTo(index + 1));
+      
+      /* ---------------- DRAG ---------------- */
+      
+      function startDrag(e) {
+        stopAutoScroll();
+        isDragging = true;
+        
+        startX = e.type.includes("mouse") ?
+          e.pageX :
+          e.touches[0].clientX;
+        
+        track.style.transition = "none";
+      }
+      
+      
+      function drag(e) {
+        if (!isDragging) return;
+        
+        const currentX = e.type.includes("mouse") ?
+          e.pageX :
+          e.touches[0].clientX;
+        
+        const diff = currentX - startX;
+        
+        track.style.transform = `translateX(${baseTranslate + diff}px)`;
+      }
+      
+      
+      function endDrag(e) {
+        if (!isDragging) return;
+        isDragging = false;
+        
+        const endX = e.type.includes("mouse") ?
+          e.pageX :
+          (e.changedTouches ? e.changedTouches[0].clientX : startX);
+        
+        const diff = endX - startX;
+        
+        if (diff < 0) {
+          index++;
+        } else if (diff > 0) {
+          index--;
+        }
+        
+        // Always snap clean
+        setPosition(true);
+        updateDots();
+        resetAutoScroll();
+      }
+      
+      
+      
+      function animation() {
+        track.style.transform = `translateX(${currentTranslate}px)`;
+        if (isDragging) requestAnimationFrame(animation);
+      }
+      
+      track.addEventListener("mousedown", startDrag);
+      track.addEventListener("touchstart", startDrag, { passive: true });
+      
+      window.addEventListener("mousemove", drag);
+      window.addEventListener("touchmove", drag, { passive: true });
+      
+      window.addEventListener("mouseup", endDrag);
+      window.addEventListener("touchend", endDrag);
+      
+      /* ---------------- AUTO SCROLL ---------------- */
+      
+      function startAutoScroll() {
+        autoScroll = setInterval(() => {
+          index++;
+          setPosition(true);
+          updateDots();
+        }, 3500);
+      }
+      
+      function stopAutoScroll() {
+        clearInterval(autoScroll);
+      }
+      
+      function resetAutoScroll() {
+        stopAutoScroll();
+        startAutoScroll();
+      }
+      
+      /* ---------------- INIT ---------------- */
+      
+      setPosition(false);
+      updateDots();
+      startAutoScroll();
+      
+      window.addEventListener("resize", () => {
+        setPosition(false);
+      });
+    }
+    
+    /* INIT BOTH */
+    initCarousel(".desktop-carousel", ".desktop-dots");
+    initCarousel(".mobile-carousel", ".mobile-dots");
 
   }, []);
 
@@ -371,4 +558,4 @@ export default function Home() {
 
     </>
   );
-    }
+            }
