@@ -67,6 +67,12 @@ export default function Home() {
       else openSheet();
     });
 
+    bottomSheet.addEventListener("click", (e) => {
+      if (e.target.tagName === "A") {
+        closeSheet();
+      }
+    });
+
     function dragStart(e) {
       if (isClosing) return;
       isDragging = true;
