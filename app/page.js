@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Navbar from "@/components/Navbar"
-import FAQ from "@/components/FAQ"
-import LoadingScreen from "@/components/LoadingScreen"
+import Navbar from "../components/Navbar"
+import FAQ from "../components/FAQ"
+import LoadingScreen from "../components/LoadingScreen"
 
 export default function Home() {
   const [loading, setLoading] = useState(true)
