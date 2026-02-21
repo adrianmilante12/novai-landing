@@ -11,16 +11,7 @@ export default function Home() {
         const answer = button.nextElementSibling;
         answer.style.maxHeight = answer.style.maxHeight ? null : answer.scrollHeight + "px";
       });
-    });
-
-    // Scroll Reveal Animations
-    ScrollReveal().reveal('.reveal', {
-      distance: '60px',
-      duration: 1200,
-      easing: 'ease-out',
-      origin: 'bottom',
-      interval: 200
-    });
+    })
 
     // 3D Floating Effect
     document.querySelectorAll(".floating").forEach(card => {
