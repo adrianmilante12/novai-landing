@@ -1,7 +1,6 @@
 'use client'; // needed for interactivity (JS) on this page
 
 import { useEffect } from 'react';
-import ScrollReveal from 'scrollreveal';
 
 export default function Home() {
 
