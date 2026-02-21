@@ -1,30 +1,41 @@
-"use client"
-import { useState } from "react"
+import { useState } from "react";
 
 export default function FAQ() {
-  const [open, setOpen] = useState(null)
+  const faqs = [
+    {
+      question: "Can I customize it easily?",
+      answer: "Yes. You can edit text, images, and colors in minutes."
+    },
+    {
+      question: "Do I need coding experience?",
+      answer: "Basic HTML knowledge helps, but documentation is included."
+    },
+  ];
 
   return (
     <section className="faq container" id="faq">
       <h2>Frequently Asked Questions</h2>
-
-      <div className="faq-item">
-        <button
-          className="faq-question"
-          onClick={() => setOpen(open === 1 ? null : 1)}
-        >
-          Can I customize it easily?
-        </button>
-
-        <div
-          className="faq-answer"
-          style={{
-            maxHeight: open === 1 ? "200px" : "0px"
-          }}
-        >
-          Yes. You can edit text, images, and colors in minutes.
-        </div>
-      </div>
+      {faqs.map((faq, index) => (
+        <FAQItem key={index} question={faq.question} answer={faq.answer} />
+      ))}
     </section>
-  )
+  );
 }
+
+function FAQItem({ question, answer }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="faq-item">
+      <button className="faq-question" onClick={() => setOpen(!open)}>
+        {question}
+      </button>
+      <div
+        className="faq-answer"
+        style={{ maxHeight: open ? "200px" : "0", transition: "max-height 0.3s ease" }}
+      >
+        {answer}
+      </div>
+    </div>
+  );
+    }
